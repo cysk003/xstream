@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2015, 2017, 2021 XStream Committers.
+ * Copyright (C) 2015, 2017, 2021, 2024 XStream Committers.
  * All rights reserved.
  *
  * The software in this package is published under the terms of the BSD
@@ -18,6 +18,7 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
+import org.codehaus.jettison.json.JSONObject;
 import org.openjdk.jmh.annotations.Benchmark;
 import org.openjdk.jmh.annotations.BenchmarkMode;
 import org.openjdk.jmh.annotations.Fork;
@@ -69,6 +70,10 @@ import com.thoughtworks.xstream.security.PrimitiveTypePermission;
 @Threads(1)
 @Warmup(iterations = 5)
 public class ParserBenchmark {
+    {
+        // Increase max recursion depth for Jettison
+        JSONObject.setGlobalRecursionDepthLimit(2000);
+    }
 
     /**
      * Driver factory. Enum values used as parameter for the parser benchmark methods.
@@ -229,7 +234,7 @@ public class ParserBenchmark {
             }
         },
         /**
-         * Nested list in list structure, 500 elements deep.
+         * Nested list in list structure, 1000 elements deep.
          *
          * @author J&ouml;rg Schaible
          * @since 1.4.9
@@ -331,6 +336,7 @@ public class ParserBenchmark {
         xstream.addPermission(PrimitiveTypePermission.PRIMITIVES);
         xstream.allowTypes(List.class, String.class);
         xstream.setMode(XStream.NO_REFERENCES);
+        xstream.setCollectionUpdateLimit(0);
         driver = driverFactory.getDriver();
     }
 
